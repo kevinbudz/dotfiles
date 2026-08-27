@@ -40,6 +40,7 @@ copy_file "$USER_HOME/.config/kwinrulesrc" "$DOTFILES_DIR/config/kwinrulesrc"
 copy_file "$USER_HOME/.config/plasma-org.kde.plasma.desktop-appletsrc" "$DOTFILES_DIR/config/plasma-org.kde.plasma.desktop-appletsrc"
 copy_file "$USER_HOME/.config/plasmarc" "$DOTFILES_DIR/config/plasmarc"
 copy_file "$USER_HOME/.config/plasmashellrc" "$DOTFILES_DIR/config/plasmashellrc"
+copy_file "$USER_HOME/.config/kscreenlockerrc" "$DOTFILES_DIR/config/kscreenlockerrc"
 copy_file "$USER_HOME/.config/spectaclerc" "$DOTFILES_DIR/config/spectaclerc"
 copy_file "$USER_HOME/.config/gtkrc" "$DOTFILES_DIR/config/gtkrc"
 copy_file "$USER_HOME/.config/gtkrc-2.0" "$DOTFILES_DIR/config/gtkrc-2.0"
@@ -68,6 +69,7 @@ copy_file "$USER_HOME/.local/share/applications/Alacritty.desktop" "$DOTFILES_DI
 copy_dir "$USER_HOME/.local/share/fonts" "$DOTFILES_DIR/local/share/fonts"
 copy_dir "$USER_HOME/.local/share/klassy-gtk-fixes" "$DOTFILES_DIR/local/share/klassy-gtk-fixes"
 copy_dir "$USER_HOME/.local/share/plasma/plasmoids/io.github.kevinbudz.quickclock" "$DOTFILES_DIR/local/share/plasma/plasmoids/io.github.kevinbudz.quickclock"
+copy_dir "$USER_HOME/.local/share/plasma/look-and-feel" "$DOTFILES_DIR/local/share/plasma/look-and-feel"
 
 # 3. SDDM themes (if present)
 if [[ -d "$USER_HOME/.local/share/sddm/themes/pear" ]]; then
