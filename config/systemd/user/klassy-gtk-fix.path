@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch for kde-gtk-config overwriting window decorations
+
+[Path]
+PathChanged=%h/.config/gtk-3.0/window_decorations.css
+Unit=klassy-gtk-fix.service
+
+[Install]
+WantedBy=default.target

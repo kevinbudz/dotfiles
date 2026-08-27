@@ -1,0 +1,6 @@
+[window]
+dynamic_padding = true
+
+[window.padding]
+x = 6
+y = 6

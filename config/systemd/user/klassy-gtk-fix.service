@@ -1,0 +1,6 @@
+[Unit]
+Description=Re-apply Klassy GTK fixes
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/klassy-gtk-fix.sh

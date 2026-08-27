@@ -1,0 +1,161 @@
+headerbar button.titlebutton.close, .titlebar button.titlebutton.close {
+  background-image: url("assets/close-normal.svg");
+}
+headerbar button.titlebutton.close:hover, .titlebar button.titlebutton.close:hover {
+  background-image: url("assets/close-hover.svg");
+}
+headerbar button.titlebutton.close:active, .titlebar button.titlebutton.close:active {
+  background-image: url("assets/close-active.svg");
+}
+headerbar button.titlebutton.close:backdrop, .titlebar button.titlebutton.close:backdrop {
+  background-image: url("assets/close-backdrop-normal.svg");
+}
+headerbar button.titlebutton.close:backdrop:hover, .titlebar button.titlebutton.close:backdrop:hover {
+  background-image: url("assets/close-backdrop-hover.svg");
+}
+headerbar button.titlebutton.close:backdrop:active, .titlebar button.titlebutton.close:backdrop:active {
+  background-image: url("assets/close-backdrop-active.svg");
+}
+headerbar button.titlebutton.maximize, .titlebar button.titlebutton.maximize {
+  background-image: url("assets/maximize-normal.svg");
+}
+headerbar button.titlebutton.maximize:hover, .titlebar button.titlebutton.maximize:hover {
+  background-image: url("assets/maximize-hover.svg");
+}
+headerbar button.titlebutton.maximize:active, .titlebar button.titlebutton.maximize:active {
+  background-image: url("assets/maximize-active.svg");
+}
+headerbar button.titlebutton.maximize:backdrop, .titlebar button.titlebutton.maximize:backdrop {
+  background-image: url("assets/maximize-backdrop-normal.svg");
+}
+headerbar button.titlebutton.maximize:backdrop:hover, .titlebar button.titlebutton.maximize:backdrop:hover {
+  background-image: url("assets/maximize-backdrop-hover.svg");
+}
+headerbar button.titlebutton.maximize:backdrop:active, .titlebar button.titlebutton.maximize:backdrop:active {
+  background-image: url("assets/maximize-backdrop-active.svg");
+}
+headerbar button.titlebutton.minimize, .titlebar button.titlebutton.minimize {
+  background-image: url("assets/minimize-normal.svg");
+}
+headerbar button.titlebutton.minimize:hover, .titlebar button.titlebutton.minimize:hover {
+  background-image: url("assets/minimize-hover.svg");
+}
+headerbar button.titlebutton.minimize:active, .titlebar button.titlebutton.minimize:active {
+  background-image: url("assets/minimize-active.svg");
+}
+headerbar button.titlebutton.minimize:backdrop, .titlebar button.titlebutton.minimize:backdrop {
+  background-image: url("assets/minimize-backdrop-normal.svg");
+}
+headerbar button.titlebutton.minimize:backdrop:hover, .titlebar button.titlebutton.minimize:backdrop:hover {
+  background-image: url("assets/minimize-backdrop-hover.svg");
+}
+headerbar button.titlebutton.minimize:backdrop:active, .titlebar button.titlebutton.minimize:backdrop:active {
+  background-image: url("assets/minimize-backdrop-active.svg");
+}
+.maximized headerbar button.titlebutton.maximize, .maximized .titlebar button.titlebutton.maximize {
+  background-image: url("assets/maximized-normal.svg");
+}
+.maximized headerbar button.titlebutton.maximize:hover, .maximized .titlebar button.titlebutton.maximize:hover {
+  background-image: url("assets/maximized-hover.svg");
+}
+.maximized headerbar button.titlebutton.maximize:active, .maximized .titlebar button.titlebutton.maximize:active {
+  background-image: url("assets/maximized-active.svg");
+}
+.maximized headerbar button.titlebutton.maximize:backdrop, .maximized .titlebar button.titlebutton.maximize:backdrop {
+  background-image: url("assets/maximized-backdrop-normal.svg");
+}
+.maximized headerbar button.titlebutton.maximize:backdrop:hover, .maximized .titlebar button.titlebutton.maximize:backdrop:hover {
+  background-image: url("assets/maximized-backdrop-hover.svg");
+}
+.maximized headerbar button.titlebutton.maximize:backdrop:active, .maximized .titlebar button.titlebutton.maximize:backdrop:active {
+  background-image: url("assets/maximized-backdrop-active.svg");
+}
+
+/* Klassy Firefox/GTK fixes - bigger icons, centered, no circle hover */
+window headerbar, window .titlebar, headerbar, .titlebar {
+  min-height: 32px;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+window headerbar button.titlebutton,
+window .titlebar button.titlebutton,
+headerbar button.titlebutton,
+.titlebar button.titlebutton {
+  min-width: 32px;
+  min-height: 26px;
+  padding: 0;
+  margin: 2px 0;
+  border: none;
+  box-shadow: none;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 18px 18px;
+  -gtk-icon-shadow: none;
+  opacity: 1;
+  transition: all 150ms ease-in-out;
+  border-radius: 0;
+}
+
+headerbar button.titlebutton.close,
+.titlebar button.titlebutton.close {
+  min-width: 35px;
+}
+
+headerbar button.titlebutton + button.titlebutton,
+.titlebar button.titlebutton + button.titlebutton {
+  margin-left: 8px;
+}
+
+headerbar button.titlebutton:first-child,
+.titlebar button.titlebutton:first-child {
+  margin-left: 0;
+}
+
+headerbar button.titlebutton:hover,
+.titlebar button.titlebutton:hover {
+  box-shadow: none;
+  border-color: transparent;
+  background-color: transparent;
+}
+
+headerbar button.titlebutton:active,
+.titlebar button.titlebutton:active {
+  box-shadow: none;
+  border-color: transparent;
+  background-color: transparent;
+}
+
+headerbar button.titlebutton:backdrop,
+.titlebar button.titlebutton:backdrop {
+  opacity: 0.9;
+}
+
+headerbar.default-decoration button.titlebutton,
+.titlebar.default-decoration button.titlebutton {
+  min-height: 26px;
+  min-width: 32px;
+  padding: 0;
+  margin: 2px 0;
+}
+
+headerbar.default-decoration button.titlebutton + button.titlebutton {
+  margin-left: 8px;
+}
+
+headerbar .windowcontrols,
+.titlebar .windowcontrols {
+  margin: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+windowcontrols button {
+  min-width: 32px;
+  min-height: 26px;
+  border-radius: 0;
+  background-size: 18px 18px;
+}

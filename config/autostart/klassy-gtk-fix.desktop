@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Klassy GTK Fix
+Exec=__HOME__/.local/bin/klassy-gtk-fix.sh
+X-GNOME-Autostart-enabled=true
+Comment=Ensure Klassy GTK window decorations match KWin decoration sizing/spacing/hover
