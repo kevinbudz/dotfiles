@@ -9,50 +9,56 @@ Item {
     width: 1920
     height: 1080
 
-    // Detect if this screen instance is landscape
-    readonly property bool isLandscape: width >= height
-
-    // Check if this screen is the primary screen or target
-    readonly property bool isTargetScreen: {
-        if (typeof primaryScreen !== "undefined") {
-            return primaryScreen
+    // Determine if the login UI should be displayed on this screen
+    readonly property bool showLoginUi: {
+        // 1. Never show login UI on a vertical/portrait display
+        if (root.width < root.height) {
+            return false
         }
-        return true
-    }
 
-    // Show UI only on the primary landscape monitor
-    readonly property bool showLoginUi: isLandscape && isTargetScreen
+        // 2. If SDDM marks this view as the primary screen, show it
+        if (typeof primaryScreen !== "undefined" && primaryScreen === true) {
+            return true
+        }
+
+        // 3. If there is only one screen or running in test mode
+        if (typeof primaryScreen === "undefined" || typeof screenModel === "undefined" || !screenModel || screenModel.count <= 1) {
+            return true
+        }
+
+        // 4. In a multi-screen setup, if this is the only landscape monitor, show it
+        if (typeof screenModel !== "undefined" && screenModel && screenModel.count > 1) {
+            var landscapeScreens = 0
+            for (var i = 0; i < screenModel.count; ++i) {
+                var scr = screenModel.get(i)
+                if (scr && scr.geometry.width >= scr.geometry.height) {
+                    landscapeScreens++
+                }
+            }
+            if (landscapeScreens <= 1) {
+                return true
+            }
+        }
+
+        return false
+    }
 
     LayoutMirroring.enabled: Qt.locale().textDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
 
-    // Background for single root multi-screen setups
-    Repeater {
-        model: (typeof screenModel !== "undefined" && screenModel && screenModel.count > 1) ? screenModel : 0
-
-        Item {
-            x: geometry.x
-            y: geometry.y
-            width: geometry.width
-            height: geometry.height
-
-            Background {
-                anchors.fill: parent
-            }
-        }
-    }
-
-    // Default full-screen background for per-screen window setups
+    // Background wallpaper is always rendered on every monitor
     Background {
+        id: bg
         anchors.fill: parent
-        visible: (typeof screenModel === "undefined" || !screenModel || screenModel.count <= 1)
+        z: 0
     }
 
-    // Login UI Container - ONLY visible on the landscape display
+    // Login UI Container (Clock, TopBar, Login form)
     Item {
         id: uiContainer
         anchors.fill: parent
         visible: root.showLoginUi
+        z: 1
 
         TopBar {
             id: topBar
