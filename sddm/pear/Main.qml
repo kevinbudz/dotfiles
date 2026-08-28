@@ -9,18 +9,10 @@ Item {
     width: 1920
     height: 1080
 
-    property string screenName: ""
-
-    readonly property bool showLoginUi: {
-        var target = (config.loginScreenOutput || "").trim()
-        if (target.length > 0)
-            return screenName === target || screenName.indexOf(target) >= 0
-        return primaryScreen
-    }
-
     LayoutMirroring.enabled: Qt.locale().textDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
 
+    // Background on all monitors
     Repeater {
         model: screenModel
 
@@ -30,55 +22,79 @@ Item {
             width: geometry.width
             height: geometry.height
 
-            Component.onCompleted: root.screenName = name
-
             Background {
                 anchors.fill: parent
             }
         }
     }
 
-    Clock {
-        id: clock
-        visible: root.showLoginUi
-        referenceSize: Math.min(root.width, root.height)
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
-        anchors.topMargin: Math.min(root.width, root.height) * (parseFloat(config.clockTopMargin) || 0.12)
-    }
-
-    TopBar {
-        id: topBar
-        visible: root.showLoginUi
-        z: 2
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        z: topBar.sessionMenuOpen ? 1 : -1
-        enabled: root.showLoginUi && topBar.sessionMenuOpen
-        visible: root.showLoginUi && topBar.sessionMenuOpen
-        propagateComposedEvents: true
-        onClicked: (mouse) => {
-            topBar.sessionMenuOpen = false
-            mouse.accepted = true
+    // Target screen geometry helper
+    readonly property var targetGeometry: {
+        var target = (config.loginScreenOutput || "").trim()
+        if (typeof screenModel !== "undefined" && screenModel && screenModel.count > 0) {
+            for (var i = 0; i < screenModel.count; ++i) {
+                var item = screenModel.get(i)
+                if (item && target.length > 0 && (item.name === target || item.name.indexOf(target) >= 0)) {
+                    return item.geometry
+                }
+            }
+            if (screenModel.primaryIndex >= 0 && screenModel.primaryIndex < screenModel.count) {
+                var p = screenModel.get(screenModel.primaryIndex)
+                if (p) return p.geometry
+            }
+            var first = screenModel.get(0)
+            if (first) return first.geometry
         }
+        return Qt.rect(0, 0, root.width, root.height)
     }
 
-    Login {
-        id: login
-        visible: root.showLoginUi
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: parent.height * (parseFloat(config.loginBottomMargin) || 0.14)
-        sessionIndex: topBar.sessionIndex
-        z: 1
+    Item {
+        id: uiContainer
+        x: root.targetGeometry.x
+        y: root.targetGeometry.y
+        width: root.targetGeometry.width
+        height: root.targetGeometry.height
+        visible: true
 
-        onLoginRequest: (username, password, sessionIdx) => {
-            sddm.login(username, password, sessionIdx)
+        TopBar {
+            id: topBar
+            z: 2
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+        }
+
+        Clock {
+            id: clock
+            referenceSize: Math.min(parent.width, parent.height)
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: Math.min(parent.width, parent.height) * (parseFloat(config.clockTopMargin) || 0.12)
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            z: topBar.sessionMenuOpen ? 1 : -1
+            enabled: topBar.sessionMenuOpen
+            visible: topBar.sessionMenuOpen
+            propagateComposedEvents: true
+            onClicked: (mouse) => {
+                topBar.sessionMenuOpen = false
+                mouse.accepted = true
+            }
+        }
+
+        Login {
+            id: login
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: parent.height * (parseFloat(config.loginBottomMargin) || 0.14)
+            sessionIndex: topBar.sessionIndex
+            z: 1
+
+            onLoginRequest: (username, password, sessionIdx) => {
+                sddm.login(username, password, sessionIdx)
+            }
         }
     }
 
