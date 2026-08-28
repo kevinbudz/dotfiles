@@ -9,12 +9,26 @@ Item {
     width: 1920
     height: 1080
 
+    // Detect if this screen instance is landscape
+    readonly property bool isLandscape: width >= height
+
+    // Check if this screen is the primary screen or target
+    readonly property bool isTargetScreen: {
+        if (typeof primaryScreen !== "undefined") {
+            return primaryScreen
+        }
+        return true
+    }
+
+    // Show UI only on the primary landscape monitor
+    readonly property bool showLoginUi: isLandscape && isTargetScreen
+
     LayoutMirroring.enabled: Qt.locale().textDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
 
-    // Background on all monitors
+    // Background for single root multi-screen setups
     Repeater {
-        model: screenModel
+        model: (typeof screenModel !== "undefined" && screenModel && screenModel.count > 1) ? screenModel : 0
 
         Item {
             x: geometry.x
@@ -28,33 +42,17 @@ Item {
         }
     }
 
-    // Target screen geometry helper
-    readonly property var targetGeometry: {
-        var target = (config.loginScreenOutput || "").trim()
-        if (typeof screenModel !== "undefined" && screenModel && screenModel.count > 0) {
-            for (var i = 0; i < screenModel.count; ++i) {
-                var item = screenModel.get(i)
-                if (item && target.length > 0 && (item.name === target || item.name.indexOf(target) >= 0)) {
-                    return item.geometry
-                }
-            }
-            if (screenModel.primaryIndex >= 0 && screenModel.primaryIndex < screenModel.count) {
-                var p = screenModel.get(screenModel.primaryIndex)
-                if (p) return p.geometry
-            }
-            var first = screenModel.get(0)
-            if (first) return first.geometry
-        }
-        return Qt.rect(0, 0, root.width, root.height)
+    // Default full-screen background for per-screen window setups
+    Background {
+        anchors.fill: parent
+        visible: (typeof screenModel === "undefined" || !screenModel || screenModel.count <= 1)
     }
 
+    // Login UI Container - ONLY visible on the landscape display
     Item {
         id: uiContainer
-        x: root.targetGeometry.x
-        y: root.targetGeometry.y
-        width: root.targetGeometry.width
-        height: root.targetGeometry.height
-        visible: true
+        anchors.fill: parent
+        visible: root.showLoginUi
 
         TopBar {
             id: topBar
@@ -102,11 +100,15 @@ Item {
         target: sddm
 
         function onLoginFailed() {
-            login.onLoginFailed()
+            if (root.showLoginUi) {
+                login.onLoginFailed()
+            }
         }
 
         function onLoginSucceeded() {
-            login.onLoginSucceeded()
+            if (root.showLoginUi) {
+                login.onLoginSucceeded()
+            }
         }
     }
 }
