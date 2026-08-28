@@ -9,111 +9,103 @@ Item {
     width: 1920
     height: 1080
 
-    // Determine if the login UI should be displayed on this screen
-    readonly property bool showLoginUi: {
-        // 1. Never show login UI on a vertical/portrait display
-        if (root.width < root.height) {
-            return false
-        }
-
-        // 2. If SDDM marks this view as the primary screen, show it
-        if (typeof primaryScreen !== "undefined" && primaryScreen === true) {
-            return true
-        }
-
-        // 3. If there is only one screen or running in test mode
-        if (typeof primaryScreen === "undefined" || typeof screenModel === "undefined" || !screenModel || screenModel.count <= 1) {
-            return true
-        }
-
-        // 4. In a multi-screen setup, if this is the only landscape monitor, show it
-        if (typeof screenModel !== "undefined" && screenModel && screenModel.count > 1) {
-            var landscapeScreens = 0
-            for (var i = 0; i < screenModel.count; ++i) {
-                var scr = screenModel.get(i)
-                if (scr && scr.geometry.width >= scr.geometry.height) {
-                    landscapeScreens++
-                }
-            }
-            if (landscapeScreens <= 1) {
-                return true
-            }
-        }
-
-        return false
-    }
-
     LayoutMirroring.enabled: Qt.locale().textDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
 
-    // Background wallpaper is always rendered on every monitor
+    // Fallback background when screenModel is not available
     Background {
-        id: bg
         anchors.fill: parent
-        z: 0
+        visible: typeof screenModel === "undefined" || !screenModel || screenModel.count === 0
     }
 
-    // Login UI Container (Clock, TopBar, Login form)
-    Item {
-        id: uiContainer
+    // Multi-screen repeater: creates background on all screens, but UI ONLY on landscape screens
+    Repeater {
+        model: screenModel
+
+        Item {
+            x: geometry.x
+            y: geometry.y
+            width: geometry.width
+            height: geometry.height
+
+            Background {
+                anchors.fill: parent
+            }
+
+            Loader {
+                anchors.fill: parent
+                // ONLY activate the login UI if the monitor is landscape (width >= height)
+                active: geometry.width >= geometry.height
+                sourceComponent: loginUiComponent
+            }
+        }
+    }
+
+    // Fallback UI loader for single-screen test mode or when screenModel is empty
+    Loader {
         anchors.fill: parent
-        visible: root.showLoginUi
-        z: 1
+        active: typeof screenModel === "undefined" || !screenModel || screenModel.count === 0
+        sourceComponent: loginUiComponent
+    }
 
-        TopBar {
-            id: topBar
-            z: 2
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-        }
+    // The complete Login UI Component (TopBar, macOS Clock, Login Form)
+    Component {
+        id: loginUiComponent
 
-        Clock {
-            id: clock
-            referenceSize: Math.min(parent.width, parent.height)
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: parent.top
-            anchors.topMargin: Math.min(parent.width, parent.height) * (parseFloat(config.clockTopMargin) || 0.12)
-        }
-
-        MouseArea {
+        Item {
             anchors.fill: parent
-            z: topBar.sessionMenuOpen ? 1 : -1
-            enabled: topBar.sessionMenuOpen
-            visible: topBar.sessionMenuOpen
-            propagateComposedEvents: true
-            onClicked: (mouse) => {
-                topBar.sessionMenuOpen = false
-                mouse.accepted = true
+
+            TopBar {
+                id: topBar
+                z: 2
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
             }
-        }
 
-        Login {
-            id: login
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: parent.height * (parseFloat(config.loginBottomMargin) || 0.14)
-            sessionIndex: topBar.sessionIndex
-            z: 1
-
-            onLoginRequest: (username, password, sessionIdx) => {
-                sddm.login(username, password, sessionIdx)
+            Clock {
+                id: clock
+                referenceSize: Math.min(parent.width, parent.height)
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: Math.min(parent.width, parent.height) * (parseFloat(config.clockTopMargin) || 0.12)
             }
-        }
-    }
 
-    Connections {
-        target: sddm
-
-        function onLoginFailed() {
-            if (root.showLoginUi) {
-                login.onLoginFailed()
+            MouseArea {
+                anchors.fill: parent
+                z: topBar.sessionMenuOpen ? 1 : -1
+                enabled: topBar.sessionMenuOpen
+                visible: topBar.sessionMenuOpen
+                propagateComposedEvents: true
+                onClicked: (mouse) => {
+                    topBar.sessionMenuOpen = false
+                    mouse.accepted = true
+                }
             }
-        }
 
-        function onLoginSucceeded() {
-            if (root.showLoginUi) {
-                login.onLoginSucceeded()
+            Login {
+                id: login
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: parent.height * (parseFloat(config.loginBottomMargin) || 0.14)
+                sessionIndex: topBar.sessionIndex
+                z: 1
+
+                onLoginRequest: (username, password, sessionIdx) => {
+                    sddm.login(username, password, sessionIdx)
+                }
+
+                Connections {
+                    target: sddm
+
+                    function onLoginFailed() {
+                        login.onLoginFailed()
+                    }
+
+                    function onLoginSucceeded() {
+                        login.onLoginSucceeded()
+                    }
+                }
             }
         }
     }
