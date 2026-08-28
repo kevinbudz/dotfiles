@@ -160,12 +160,10 @@ if [[ "$DO_BACKUP" == "true" ]]; then
         ".config/alacritty"
         ".config/fish"
         ".config/dolphinrc"
-        ".config/kscreenlockerrc"
         ".config/spectaclerc"
         ".config/xsettingsd"
         ".local/share/fonts"
         ".local/share/klassy-gtk-fixes"
-        ".local/share/plasma/look-and-feel"
         ".local/share/plasma/plasmoids/io.github.kevinbudz.quickclock"
     )
 
@@ -202,12 +200,6 @@ cp -rf "$DOTFILES_DIR/local/share/klassy-gtk-fixes/"* "$USER_HOME/.local/share/k
 log_info "Deploying QuickClock plasmoid..."
 mkdir -p "$USER_HOME/.local/share/plasma/plasmoids/io.github.kevinbudz.quickclock"
 cp -rf "$DOTFILES_DIR/local/share/plasma/plasmoids/io.github.kevinbudz.quickclock/"* "$USER_HOME/.local/share/plasma/plasmoids/io.github.kevinbudz.quickclock/"
-
-log_info "Deploying Pear Look-and-Feel & Lock Screen package..."
-if [[ -d "$DOTFILES_DIR/local/share/plasma/look-and-feel" ]]; then
-    mkdir -p "$USER_HOME/.local/share/plasma/look-and-feel"
-    cp -rf "$DOTFILES_DIR/local/share/plasma/look-and-feel/"* "$USER_HOME/.local/share/plasma/look-and-feel/"
-fi
 
 log_info "Deploying application desktop launchers..."
 mkdir -p "$USER_HOME/.local/share/plasma_icons"

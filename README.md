@@ -18,7 +18,6 @@ A clean, modern, macOS-inspired KDE Plasma 6 setup featuring **Klassy** window d
 | **Typography** | Google Sans (Variable), Noto Sans (Bold for panel clock), slight hinting, subpixel antialiasing |
 | **Terminal** | Alacritty (6px padding, dynamic padding enabled) + Fish Shell |
 | **SDDM Login Theme** | `Pear` / `Sonoma` macOS-inspired greeter |
-| **Wake / Lock Screen** | `Pear` Look-and-Feel package (`org.kde.pear.desktop` via KScreenLocker) matching SDDM login styling |
 | **GTK Integration** | Real-time Klassy decoration sync service (`klassy-gtk-fix.path` + `klassy-gtk-fix.service`) ensuring GTK 3 & 4 apps match KWin titlebars |
 
 ---
