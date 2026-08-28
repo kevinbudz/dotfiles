@@ -1,0 +1,7 @@
+[Greeter][General]
+alwaysShowClock=true
+hideClockWhenIdle=false
+
+[Greeter][Wallpaper][org.kde.image][General]
+Image=file:///home/kevin/.local/share/wallpapers/fabrizio-conti-k6GpdsPJSZw-unsplash.jpg
+PreviewImage=file:///home/kevin/.local/share/wallpapers/fabrizio-conti-k6GpdsPJSZw-unsplash.jpg

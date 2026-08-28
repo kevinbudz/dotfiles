@@ -160,6 +160,7 @@ if [[ "$DO_BACKUP" == "true" ]]; then
         ".config/alacritty"
         ".config/fish"
         ".config/dolphinrc"
+        ".config/kscreenlockerrc"
         ".config/spectaclerc"
         ".config/xsettingsd"
         ".local/share/fonts"
