@@ -27,13 +27,18 @@ if command -v pkill &>/dev/null; then
     pkill -HUP xsettingsd 2>/dev/null || true
 fi
 
+echo "==> Setting up environment variables..."
+if command -v systemctl &>/dev/null; then
+    systemctl --user set-environment QT_PLUGIN_PATH="${HOME}/.local/lib/qt6/plugins:/usr/lib/qt6/plugins" 2>/dev/null || true
+fi
+
 echo "==> Refreshing Plasma shell..."
 if systemctl --user is-active --quiet plasma-plasmashell.service 2>/dev/null; then
     systemctl --user restart plasma-plasmashell.service 2>/dev/null || true
 elif pgrep -x plasmashell >/dev/null; then
-    if command -v qdbus6 &>/dev/null; then
-        qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.refreshCurrentShell 2>/dev/null || true
-    fi
+    killall plasmashell 2>/dev/null || true
+    sleep 0.5
+    (QT_PLUGIN_PATH="${HOME}/.local/lib/qt6/plugins:/usr/lib/qt6/plugins" kstart plasmashell &>/dev/null &) || true
 fi
 
 echo "Plasma appearance and settings reloaded successfully."

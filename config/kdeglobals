@@ -134,6 +134,13 @@ ForegroundVisited=155,89,182
 
 [General]
 ColorSchemeHash=9d38eb71ded8ff549da26d57d7cbab9164da243a
+XftAntialias=true
+XftHintStyle=hintslight
+XftSubPixel=none
+font=Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0
+menuFont=Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0
+smallestReadableFont=Inter,8,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0
+toolBarFont=Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,,0,0
 
 [Icons]
 Theme=Papirus-Apps-Only
@@ -163,6 +170,7 @@ View Style=DetailTree
 [WM]
 activeBackground=39,44,49
 activeBlend=252,252,252
+activeFont=Inter,10,-1,5,600,0,0,0,0,0,0,0,0,0,0,1,SemiBold,0,0
 activeForeground=252,252,252
 inactiveBackground=32,36,40
 inactiveBlend=161,169,177

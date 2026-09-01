@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Centered fastfetch wrapper
+
+if [ -t 1 ]; then
+    has_special_flag=false
+    for arg in "$@"; do
+        case "$arg" in
+            --logo-padding*|-h|--help|-v|--version|--version-raw|--list-*|--print-*)
+                has_special_flag=true
+                break
+                ;;
+        esac
+    done
+
+    if [ "$has_special_flag" = false ]; then
+        cols=$(tput cols 2>/dev/null || echo "${COLUMNS:-80}")
+        if [ -n "$cols" ] && [ "$cols" -gt 0 ] 2>/dev/null; then
+            content_width=58
+            pad=$(( (cols - content_width) / 2 ))
+            [ "$pad" -lt 0 ] && pad=0
+            exec /usr/bin/fastfetch --logo-padding-left "$pad" "$@"
+        fi
+    fi
+fi
+
+exec /usr/bin/fastfetch "$@"

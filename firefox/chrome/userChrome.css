@@ -1,0 +1,90 @@
+/* Klassy Firefox fixes - inline tabs, bigger icons, centered, square full-button hover */
+@namespace xul url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+#titlebar { appearance: none !important; }
+
+.titlebar-buttonbox {
+  --titlebar-button-size: 26px !important;
+  --titlebar-button-spacing: 8px !important;
+  --titlebar-button-end-spacing: 8px !important;
+  align-items: center !important;
+}
+
+.titlebar-buttonbox-container {
+  margin-right: 8px !important;
+  margin-top: auto !important;
+  margin-bottom: auto !important;
+  align-self: center !important;
+}
+
+/* Shrink by 2px: was 34x28, now 32x26 (close 37->35) */
+.titlebar-button {
+  width: 32px !important;
+  height: 26px !important;
+  padding: 0 !important;
+  margin-left: 8px !important;
+  border-radius: 0 !important;
+  transition: background-color 150ms ease-in-out !important;
+  background-color: transparent !important;
+}
+
+.titlebar-button.titlebar-close {
+  width: 35px !important;
+}
+
+.titlebar-button > .toolbarbutton-icon {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+  background-size: 18px 18px !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  background-position: center !important;
+}
+
+/* Hover: full-button rectangle, not small square on icon */
+.titlebar-button:hover {
+  background-color: color-mix(in srgb, currentColor 12%, transparent) !important;
+  border-radius: 0 !important;
+}
+.titlebar-button:hover > .toolbarbutton-icon {
+  background-color: transparent !important;
+  border-radius: 0 !important;
+}
+
+.titlebar-button:hover:active {
+  background-color: color-mix(in srgb, currentColor 20%, transparent) !important;
+}
+.titlebar-button:hover:active > .toolbarbutton-icon {
+  background-color: transparent !important;
+}
+
+@media (-moz-gtk-theme-family: breeze) {
+  .titlebar-button:hover {
+    background-color: color-mix(in srgb, currentColor 15%, transparent) !important;
+    border-radius: 0 !important;
+    color: inherit !important;
+  }
+  .titlebar-button:hover > .toolbarbutton-icon {
+    background-color: transparent !important;
+    border-radius: 0 !important;
+  }
+  .titlebar-button:hover:active {
+    background-color: color-mix(in srgb, currentColor 30%, transparent) !important;
+  }
+  .titlebar-button:hover:active > .toolbarbutton-icon {
+    background-color: transparent !important;
+  }
+  .titlebar-button.titlebar-close:hover {
+    background-color: color-mix(in srgb, currentColor 15%, transparent) !important;
+    border-radius: 0 !important;
+  }
+  .titlebar-button.titlebar-close:hover > .toolbarbutton-icon {
+    background-color: transparent !important;
+  }
+  .titlebar-button.titlebar-close:hover:active {
+    background-color: color-mix(in srgb, currentColor 30%, transparent) !important;
+  }
+}
+.titlebar-buttonbox { align-items: center !important; }

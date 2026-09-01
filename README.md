@@ -15,9 +15,9 @@ A clean, modern, macOS-inspired KDE Plasma 6 setup featuring **Klassy** window d
 | **Top Panel** | 30px height, fixed width, always visible: AppGrid Launcher ➔ Spacers ➔ Quickbar Global Menu ➔ System Tray ➔ QuickClock |
 | **Bottom Dock** | 60px floating dock (length mode 1 / fit content, dodge windows / auto-hide): Virtual Desktop Pager + Icon-only Task Manager |
 | **Icon Theme** | `Papirus-Apps-Only` (Papirus for applications & folders + Breeze-Dark/Klassy-Dark for panel tray & system UI) |
-| **Typography** | Google Sans (Variable), Noto Sans (Bold for panel clock), slight hinting, subpixel antialiasing |
-| **Terminal** | Alacritty (6px padding, dynamic padding enabled) + Fish Shell |
-| **SDDM Login Theme** | `Pear` / `Sonoma` macOS-inspired greeter |
+| **Typography** | Inter, slight hinting, subpixel antialiasing |
+| **Terminal** | Alacritty (6px padding, dynamic padding enabled) |
+| **SDDM Login Theme** | `Pear` macOS-inspired greeter |
 | **GTK Integration** | Real-time Klassy decoration sync service (`klassy-gtk-fix.path` + `klassy-gtk-fix.service`) ensuring GTK 3 & 4 apps match KWin titlebars |
 
 ---
@@ -41,7 +41,7 @@ Options:
   -a, --all            Install everything (packages, assets, configs, themes) [default]
   -c, --configs-only   Only import dotfiles and configs (skip package manager steps)
   -p, --packages-only  Only install system and AUR packages
-  -s, --sddm           Install and enable the Pear/Sonoma SDDM theme (requires sudo)
+  -s, --sddm           Install and enable the Pear SDDM theme (requires sudo)
   --no-backup          Skip creating a timestamped backup of existing ~/.config files
   --no-reload          Skip live-reloading Plasma 6 and KWin after installation
   -h, --help           Show help message
@@ -57,7 +57,6 @@ The installer automatically installs packages via `pacman` and `paru` / `yay` on
 * `papirus-icon-theme`
 * `alacritty`
 * `fontconfig`
-* `fish`
 * `noto-fonts`, `noto-fonts-cjk`, `noto-fonts-emoji`
 * `ttf-meslo-nerd`
 * `xsettingsd`
@@ -79,10 +78,13 @@ The installer automatically installs packages via `pacman` and `paru` / `yay` on
 ├── install.sh                  # Main installer and settings importer
 ├── export.sh                   # Exports live KDE settings into the repo
 ├── README.md
+├── wallpapers/                 # Desktop & lockscreen wallpapers
 ├── config/                     # Target: ~/.config/
 │   ├── alacritty/              # Alacritty terminal settings
 │   ├── autostart/              # Autostart entries (Klassy GTK sync daemon)
-│   ├── fish/                   # Fish shell config
+│   ├── environment.d/          # Session environment overrides (plugins, gaming)
+│   ├── fastfetch/              # Fastfetch system info layout and ascii logo
+│   ├── fish/                   # Fish shell customizations
 │   ├── fontconfig/             # Subpixel antialiasing & slanting rules
 │   ├── gtk-3.0/ & gtk-4.0/     # GTK themes, colors & titlebar button assets
 │   ├── klassy/                 # Klassy window decoration configuration
@@ -92,22 +94,32 @@ The installer automatically installs packages via `pacman` and `paru` / `yay` on
 │   ├── dolphinrc               # Dolphin file manager view configuration
 │   ├── kdeglobals              # Global color scheme, fonts & icon settings
 │   ├── kglobalshortcutsrc      # Global desktop and window manager shortcuts
+│   ├── kscreenlockerrc         # Screen locker configuration
 │   ├── kwinrc                  # KWin effects, rounded corners & tiling rules
 │   ├── plasma-org.kde.plasma.desktop-appletsrc  # Panels, widgets & dock layout
 │   ├── plasmarc                # Plasma desktop theme settings
 │   ├── plasmashellrc           # Panel dimensions, floating & visibility states
 │   └── spectaclerc             # Spectacle screenshot tool preferences
+├── firefox/                    # Firefox about:config (user.js) + chrome/userChrome.css
+│   ├── user.js                 # about:config overrides (titlebar, stylesheets, GTK buttons)
+│   └── chrome/
+│       └── userChrome.css      # Klassy window-control fixes
 ├── local/                      # Target: ~/.local/
 │   ├── bin/
+│   │   ├── fastfetch / ff      # Fastfetch launchers
 │   │   └── klassy-gtk-fix.sh   # Re-applies Klassy GTK fixes when overwritten
+│   ├── lib/
+│   │   └── qt6/plugins/plasma/applets/  # Custom taskmanager library
 │   └── share/
-│       ├── fonts/              # Google Sans variable font families
-│       ├── klassy-gtk-fixes/   # Fixed CSS & assets for GTK headerbars
+│       ├── fonts/              # Custom font packages (Google Sans)
 │       ├── icons/              # Papirus-Apps-Only icon theme definition
-│       └── plasma/plasmoids/
-│           └── io.github.kevinbudz.quickclock/  # Custom QuickClock widget
-├── sddm/                       # SDDM greeter themes (Pear & Sonoma)
-├── wallpapers/                 # Desktop wallpapers
+│       ├── klassy-gtk-fixes/   # Fixed CSS & assets for GTK headerbars
+│       └── plasma/
+│           ├── desktoptheme/   # Custom dock theme definitions
+│           └── plasmoids/
+│               └── io.github.kevinbudz.quickclock/  # Custom QuickClock widget
+├── sddm/                       # SDDM greeter theme (Pear)
+│   └── pear/                   # Default macOS-inspired SDDM theme
 └── scripts/
     ├── apply-plasma-theme.sh   # Live-reloads Plasma 6, KWin & GTK caches
     └── generate-icons.sh       # Builds Papirus-Apps-Only icon theme symlinks
@@ -124,7 +136,7 @@ Whenever you customize your KDE Plasma desktop (change panel items, widgets, sho
 ```
 
 This script:
-1. Copies all relevant settings from `~/.config`, `~/.local/share`, `~/.local/bin`, and SDDM.
+1. Copies all relevant settings from `~/.config`, `~/.local/share`, `~/.local/bin`, Firefox profiles, and SDDM.
 2. Strips temporary and backup files (`*.bak`, cache files).
 3. Automatically sanitizes hardcoded paths (`/home/username`) into portable placeholders (`__HOME__`).
 
@@ -153,6 +165,6 @@ If you ever need to manually reload settings without logging out:
 
 * **Reload KWin**: `qdbus6 org.kde.KWin /KWin reconfigure`
 * **Reload Plasma Shell**: `systemctl --user restart plasma-plasmashell`
-* **Reload Font Cache**: `fc-cache -f ~/.local/share/fonts`
+* **Reload Font Cache**: `fc-cache -f`
 * **Rebuild KDE Sycoca**: `kbuildsycoca6 --noincremental`
 * **Run GTK Decoration Fix**: `~/.local/bin/klassy-gtk-fix.sh`

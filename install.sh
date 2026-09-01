@@ -34,7 +34,7 @@ ${BOLD}Options:${RESET}
   -a, --all            Install everything (packages, assets, configs, themes) [default]
   -c, --configs-only   Only import dotfiles and configs (skip package installation)
   -p, --packages-only  Only install system/AUR packages
-  -s, --sddm           Install and configure Pear/Sonoma SDDM theme (requires sudo)
+  -s, --sddm           Install and configure Pear SDDM theme (requires sudo)
   --no-backup          Do not create a backup of existing configurations
   --no-reload          Do not reload Plasma/KWin after importing
   -h, --help           Show this help message
@@ -99,7 +99,6 @@ install_packages() {
             papirus-icon-theme
             alacritty
             fontconfig
-            fish
             noto-fonts
             noto-fonts-cjk
             noto-fonts-emoji
@@ -154,18 +153,25 @@ if [[ "$DO_BACKUP" == "true" ]]; then
         ".config/kglobalshortcutsrc"
         ".config/klassy"
         ".config/breezerc"
+        ".config/gtkrc"
+        ".config/gtkrc-2.0"
         ".config/gtk-3.0"
         ".config/gtk-4.0"
         ".config/fontconfig"
         ".config/alacritty"
-        ".config/fish"
+        ".config/fish/config.fish"
         ".config/dolphinrc"
         ".config/kscreenlockerrc"
         ".config/spectaclerc"
         ".config/xsettingsd"
+        ".config/fastfetch"
+        ".config/environment.d"
         ".local/share/fonts"
+        ".local/share/wallpapers"
         ".local/share/klassy-gtk-fixes"
         ".local/share/plasma/plasmoids/io.github.kevinbudz.quickclock"
+        ".local/share/plasma/desktoptheme/custom-dock"
+        ".local/lib/qt6/plugins/plasma/applets/org.kde.plasma.taskmanager.so"
     )
 
     for item in "${BACKUP_ITEMS[@]}"; do
@@ -176,19 +182,47 @@ if [[ "$DO_BACKUP" == "true" ]]; then
             cp -r "$src" "$dst"
         fi
     done
+    # Backup Firefox about:config (user.js) + userChrome.css separately (avoid full profile)
+    for base in "$USER_HOME/.mozilla/firefox" "$USER_HOME/.config/mozilla/firefox"; do
+        [[ -d "$base" ]] || continue
+        if [[ -f "$base/profiles.ini" ]]; then
+            while IFS= read -r profile_path; do
+                [[ -z "$profile_path" ]] && continue
+                if [[ "$profile_path" = /* ]]; then
+                    profile_dir="$profile_path"
+                else
+                    profile_dir="$base/$profile_path"
+                fi
+                [[ -d "$profile_dir" ]] || continue
+                rel="${profile_dir#$USER_HOME/}"
+                if [[ -f "$profile_dir/user.js" ]]; then
+                    mkdir -p "$BACKUP_DIR/$(dirname "$rel")"
+                    cp -f "$profile_dir/user.js" "$BACKUP_DIR/$rel/user.js" 2>/dev/null || true
+                fi
+                if [[ -f "$profile_dir/chrome/userChrome.css" ]]; then
+                    mkdir -p "$BACKUP_DIR/$rel/chrome"
+                    cp -f "$profile_dir/chrome/userChrome.css" "$BACKUP_DIR/$rel/chrome/userChrome.css" 2>/dev/null || true
+                fi
+            done < <(grep -E "^Path=" "$base/profiles.ini" | cut -d= -f2-)
+        fi
+    done
     log_ok "Backup created successfully."
 fi
 
 # 3. Deploy assets and local files
-log_info "Deploying wallpapers..."
-mkdir -p "$USER_HOME/.local/share/wallpapers"
-cp -f "$DOTFILES_DIR/wallpapers/"* "$USER_HOME/.local/share/wallpapers/" 2>/dev/null || true
+if [[ -d "$DOTFILES_DIR/wallpapers" ]]; then
+    log_info "Deploying wallpapers..."
+    mkdir -p "$USER_HOME/.local/share/wallpapers"
+    cp -rf "$DOTFILES_DIR/wallpapers/"* "$USER_HOME/.local/share/wallpapers/" 2>/dev/null || true
+fi
 
-log_info "Deploying fonts..."
-mkdir -p "$USER_HOME/.local/share/fonts"
-cp -f "$DOTFILES_DIR/local/share/fonts/"*.ttf "$USER_HOME/.local/share/fonts/" 2>/dev/null || true
-if command -v fc-cache &>/dev/null; then
-    fc-cache -f "$USER_HOME/.local/share/fonts" 2>/dev/null || true
+if [[ -d "$DOTFILES_DIR/local/share/fonts" ]]; then
+    log_info "Deploying fonts..."
+    mkdir -p "$USER_HOME/.local/share/fonts"
+    cp -rf "$DOTFILES_DIR/local/share/fonts/"*.ttf "$USER_HOME/.local/share/fonts/" 2>/dev/null || true
+    if command -v fc-cache &>/dev/null; then
+        fc-cache -f "$USER_HOME/.local/share/fonts" 2>/dev/null || true
+    fi
 fi
 
 log_info "Deploying Klassy GTK fix script and assets..."
@@ -196,11 +230,29 @@ mkdir -p "$USER_HOME/.local/bin"
 mkdir -p "$USER_HOME/.local/share/klassy-gtk-fixes"
 cp -f "$DOTFILES_DIR/local/bin/klassy-gtk-fix.sh" "$USER_HOME/.local/bin/klassy-gtk-fix.sh"
 chmod +x "$USER_HOME/.local/bin/klassy-gtk-fix.sh"
+if [[ -f "$DOTFILES_DIR/local/bin/fastfetch" ]]; then
+    cp -f "$DOTFILES_DIR/local/bin/fastfetch" "$USER_HOME/.local/bin/fastfetch"
+    chmod +x "$USER_HOME/.local/bin/fastfetch"
+fi
+if [[ -f "$DOTFILES_DIR/local/bin/ff" ]]; then
+    cp -f "$DOTFILES_DIR/local/bin/ff" "$USER_HOME/.local/bin/ff"
+    chmod +x "$USER_HOME/.local/bin/ff"
+fi
 cp -rf "$DOTFILES_DIR/local/share/klassy-gtk-fixes/"* "$USER_HOME/.local/share/klassy-gtk-fixes/" 2>/dev/null || true
+
+log_info "Deploying custom Task Manager plugin..."
+mkdir -p "$USER_HOME/.local/lib/qt6/plugins/plasma/applets"
+cp -f "$DOTFILES_DIR/local/lib/qt6/plugins/plasma/applets/org.kde.plasma.taskmanager.so" "$USER_HOME/.local/lib/qt6/plugins/plasma/applets/org.kde.plasma.taskmanager.so"
 
 log_info "Deploying QuickClock plasmoid..."
 mkdir -p "$USER_HOME/.local/share/plasma/plasmoids/io.github.kevinbudz.quickclock"
 cp -rf "$DOTFILES_DIR/local/share/plasma/plasmoids/io.github.kevinbudz.quickclock/"* "$USER_HOME/.local/share/plasma/plasmoids/io.github.kevinbudz.quickclock/"
+
+if [[ -d "$DOTFILES_DIR/local/share/plasma/desktoptheme/custom-dock" ]]; then
+    log_info "Deploying Custom Dock desktop theme..."
+    mkdir -p "$USER_HOME/.local/share/plasma/desktoptheme/custom-dock"
+    cp -rf "$DOTFILES_DIR/local/share/plasma/desktoptheme/custom-dock/"* "$USER_HOME/.local/share/plasma/desktoptheme/custom-dock/" 2>/dev/null || true
+fi
 
 log_info "Deploying application desktop launchers..."
 mkdir -p "$USER_HOME/.local/share/plasma_icons"
@@ -211,6 +263,54 @@ if [[ -f "$DOTFILES_DIR/local/share/plasma_icons/Alacritty.desktop" ]]; then
 fi
 if [[ -f "$DOTFILES_DIR/local/share/applications/Alacritty.desktop" ]]; then
     cp -f "$DOTFILES_DIR/local/share/applications/Alacritty.desktop" "$USER_HOME/.local/share/applications/Alacritty.desktop"
+fi
+
+# 3b. Deploy Firefox about:config (user.js) and userChrome.css
+if [[ -d "$DOTFILES_DIR/firefox" ]]; then
+    log_info "Deploying Firefox configuration (user.js + userChrome.css)..."
+    # Detect Firefox base dirs (standard + XDG)
+    FIREFOX_BASES=(
+        "$USER_HOME/.mozilla/firefox"
+        "$USER_HOME/.config/mozilla/firefox"
+    )
+    for base in "${FIREFOX_BASES[@]}"; do
+        [[ -d "$base" ]] || continue
+        # Find profiles.ini to discover profile paths
+        if [[ -f "$base/profiles.ini" ]]; then
+            # Parse every Path= entry (IsRelative=1 means relative to base)
+            while IFS= read -r profile_path; do
+                [[ -z "$profile_path" ]] && continue
+                # profiles.ini may have absolute or relative paths
+                if [[ "$profile_path" = /* ]]; then
+                    profile_dir="$profile_path"
+                else
+                    profile_dir="$base/$profile_path"
+                fi
+                [[ -d "$profile_dir" ]] || continue
+                log_info "  -> Installing to Firefox profile: $profile_dir"
+                if [[ -f "$DOTFILES_DIR/firefox/user.js" ]]; then
+                    cp -f "$DOTFILES_DIR/firefox/user.js" "$profile_dir/user.js"
+                fi
+                if [[ -f "$DOTFILES_DIR/firefox/chrome/userChrome.css" ]]; then
+                    mkdir -p "$profile_dir/chrome"
+                    cp -f "$DOTFILES_DIR/firefox/chrome/userChrome.css" "$profile_dir/chrome/userChrome.css"
+                fi
+            done < <(grep -E "^Path=" "$base/profiles.ini" | cut -d= -f2-)
+        else
+            # Fallback: any directory containing prefs.js is a profile
+            while IFS= read -r prefs; do
+                profile_dir="$(dirname "$prefs")"
+                log_info "  -> Installing to Firefox profile (fallback): $profile_dir"
+                if [[ -f "$DOTFILES_DIR/firefox/user.js" ]]; then
+                    cp -f "$DOTFILES_DIR/firefox/user.js" "$profile_dir/user.js"
+                fi
+                if [[ -f "$DOTFILES_DIR/firefox/chrome/userChrome.css" ]]; then
+                    mkdir -p "$profile_dir/chrome"
+                    cp -f "$DOTFILES_DIR/firefox/chrome/userChrome.css" "$profile_dir/chrome/userChrome.css"
+                fi
+            done < <(find "$base" -maxdepth 3 -name "prefs.js" 2>/dev/null)
+        fi
+    done
 fi
 
 # 4. Generate Papirus-Apps-Only icon theme
@@ -247,26 +347,22 @@ fi
 # Run Klassy GTK fix initially
 "$USER_HOME/.local/bin/klassy-gtk-fix.sh" 2>/dev/null || true
 
-# 7. Optional SDDM Theme installation
+# 7. Optional SDDM Theme installation (Pear - default)
 if [[ "$DO_SDDM" == "true" ]]; then
-    log_info "Installing SDDM themes (requires sudo)..."
+    log_info "Installing Pear SDDM theme (requires sudo)..."
     if [[ -d "$DOTFILES_DIR/sddm/pear" ]]; then
         sudo mkdir -p /usr/share/sddm/themes/pear
         sudo cp -rf "$DOTFILES_DIR/sddm/pear/"* /usr/share/sddm/themes/pear/
     fi
-    if [[ -d "$DOTFILES_DIR/sddm/sonoma" ]]; then
-        sudo mkdir -p /usr/share/sddm/themes/sonoma
-        sudo cp -rf "$DOTFILES_DIR/sddm/sonoma/"* /usr/share/sddm/themes/sonoma/
-    fi
 
-    # Set pear as current theme in /etc/sddm.conf.d/kde_settings.conf or /etc/sddm.conf
+    # Set pear as current theme in /etc/sddm.conf.d/kde_settings.conf
     if [[ -d /etc/sddm.conf.d ]]; then
         sudo tee /etc/sddm.conf.d/kde_settings.conf >/dev/null <<SDDM_CONF
 [Theme]
 Current=pear
 SDDM_CONF
     fi
-    log_ok "SDDM themes installed successfully."
+    log_ok "Pear SDDM theme installed successfully."
 fi
 
 # 8. Reload Plasma & KWin

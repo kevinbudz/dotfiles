@@ -1,0 +1,10 @@
+*.bak
+*.bak.*
+*.tmp
+*.log
+*.pid
+*.lock
+*.cache
+icon-theme.cache
+.uuid
+pi-session-*.html

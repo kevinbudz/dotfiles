@@ -1,0 +1,14 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Kevin"
+            }
+        ],
+        "Description": "Custom dock style with dot and pill indicators",
+        "Id": "custom-dock",
+        "Name": "Custom Dock"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-FallbackTheme": "default"
+}
