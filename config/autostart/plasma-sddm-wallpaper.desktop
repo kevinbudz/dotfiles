@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
-Name=Sync SDDM Sonoma Wallpaper
-Comment=Updates the login screen background when Plasma starts
-Exec=sh -c '"$HOME/.local/share/sddm/themes/sonoma/scripts/sync-wallpaper.sh" || "$HOME/Desktop/sonoma-sddm/scripts/sync-wallpaper.sh"'
+Name=Sync Pear Wallpaper
+Comment=Keeps the login and lock screens on the current desktop wallpaper
+Exec=__HOME__/.local/bin/sync-wallpaper.sh
 X-KDE-Autostart-phase=1
 X-KDE-autostart-after=plasma-workspace
 OnlyShowIn=KDE;

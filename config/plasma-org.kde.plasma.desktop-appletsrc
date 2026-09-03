@@ -247,8 +247,8 @@ DialogHeight=630
 DialogWidth=810
 
 [Containments][613][Wallpaper][org.kde.image][General]
-Image=file://__HOME__/.cache/superpaper/temp/mountain-a-crop-0.png
-SlidePaths=/usr/share/wallpapers/
+Image=file://__HOME__/.local/share/wallpapers/fabrizio-conti-k6GpdsPJSZw-unsplash.jpg
+SlidePaths=__HOME__/.local/share/wallpapers/
 
 [Containments][614]
 ItemGeometries-1600x900=
@@ -267,9 +267,8 @@ DialogHeight=630
 DialogWidth=810
 
 [Containments][614][Wallpaper][org.kde.image][General]
-DynamicMode=3
-Image=file://__HOME__/.cache/superpaper/temp/mountain-a-crop-1.png
-SlidePaths=/usr/share/wallpapers/
+Image=file://__HOME__/.local/share/wallpapers/fabrizio-conti-k6GpdsPJSZw-unsplash.jpg
+SlidePaths=__HOME__/.local/share/wallpapers/
 
 [ScreenMapping]
 itemsOnDisabledScreens=0,0c9fa78b-62fd-47c6-86e2-338e081472b5,12,desktop:/rotmg,desktop://osz,desktop:/osu-slider-svg-gui,desktop://rotmg,desktop:/godot,desktop:/mappi,desktop:/testing,desktop:/neocities,desktop:/maps,desktop:/zed,desktop:/lotus,desktop:/osumappi.ng

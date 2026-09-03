@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
-Name=Sync SDDM Pear Wallpaper
-Comment=Updates the login screen background when Plasma starts
-Exec=sh -c '"$HOME/.local/share/sddm/themes/pear/scripts/sync-wallpaper.sh" || "$HOME/Desktop/home/pear/scripts/sync-wallpaper.sh"'
+Name=Sync Pear Wallpaper
+Comment=Keeps the login and lock screens on the current desktop wallpaper
+Exec=sh -c '"$HOME/.local/bin/sync-wallpaper.sh" || "$HOME/.local/share/sddm/themes/pear/scripts/sync-wallpaper.sh"'
 X-KDE-Autostart-phase=1
 X-KDE-autostart-after=plasma-workspace
 OnlyShowIn=KDE;
